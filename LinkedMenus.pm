@@ -43,7 +43,7 @@ our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw(
 
 );
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 # -----------------------------------------------
 
@@ -363,7 +363,7 @@ C<DBIx::HTML::LinkedMenus> - Convert db data to 2 linked HTML popup menus.
 
 	my(@on_load) = $linker -> javascript_for_on_load();
 
-	print $q -> start_html(title => 'Linked Menus', @on_load}),
+	print $q -> start_html({title => 'Linked Menus', @on_load}),
 	print $q -> start_form...
 	print $linker -> javascript_for_db();
 	print $linker -> html_for_base_menu();
@@ -664,6 +664,7 @@ modules, so don't be too keen on changing it :-).
 
 =head1 See Also
 
+	DBIx::HTML::ClientDB
 	DBIx::HTML::PopupRadio
 	DBIx::CSS::TreeMenu
 	DBIx::CSS::TabMenu
@@ -678,7 +679,7 @@ Home page: http://savage.net.au/index.html
 
 =head1 Copyright
 
-Austrlian copyright (c) 2002, Ron Savage. All rights reserved.
+Australian copyright (c) 2002, Ron Savage. All rights reserved.
 
 	All Programs of mine are 'OSI Certified Open Source Software';
 	you can redistribute them and/or modify them under the terms of

@@ -26,7 +26,7 @@ Synopsis
 
             my(@on_load) = $linker -> javascript_for_on_load();
 
-            print $q -> start_html(title => 'Linked Menus', @on_load}),
+            print $q -> start_html({title => 'Linked Menus', @on_load}),
             print $q -> start_form...
             print $linker -> javascript_for_db();
             print $linker -> html_for_base_menu();
@@ -292,6 +292,7 @@ Sample Code
     modules, so don't be too keen on changing it :-).
 
 See Also
+            DBIx::HTML::ClientDB
             DBIx::HTML::PopupRadio
             DBIx::CSS::TreeMenu
             DBIx::CSS::TabMenu
@@ -305,7 +306,7 @@ Author
     Home page: http://savage.net.au/index.html
 
 Copyright
-    Austrlian copyright (c) 2002, Ron Savage. All rights reserved.
+    Australian copyright (c) 2002, Ron Savage. All rights reserved.
 
             All Programs of mine are 'OSI Certified Open Source Software';
             you can redistribute them and/or modify them under the terms of

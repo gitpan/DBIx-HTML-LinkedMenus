@@ -56,7 +56,7 @@
 <PRE>
         my(@on_load) = $linker -&gt; javascript_for_on_load();</PRE>
 <PRE>
-        print $q -&gt; start_html(title =&gt; 'Linked Menus', @on_load}),
+        print $q -&gt; start_html({title =&gt; 'Linked Menus', @on_load}),
         print $q -&gt; start_form...
         print $linker -&gt; javascript_for_db();
         print $linker -&gt; html_for_base_menu();
@@ -292,6 +292,7 @@ modules, so don't be too keen on changing it :-).</P>
 <HR>
 <H1><A NAME="see also">See Also</A></H1>
 <PRE>
+        DBIx::HTML::ClientDB
         DBIx::HTML::PopupRadio
         DBIx::CSS::TreeMenu
         DBIx::CSS::TabMenu</PRE>
@@ -304,7 +305,7 @@ modules, so don't be too keen on changing it :-).</P>
 <P>
 <HR>
 <H1><A NAME="copyright">Copyright</A></H1>
-<P>Austrlian copyright (c) 2002, Ron Savage. All rights reserved.</P>
+<P>Australian copyright (c) 2002, Ron Savage. All rights reserved.</P>
 <PRE>
         All Programs of mine are 'OSI Certified Open Source Software';
         you can redistribute them and/or modify them under the terms of
