@@ -1,0 +1,4 @@
+Revision history for Perl extension DBIx::HTML::LinkedMenus.
+
+1.00  Sat Oct  08 12:37:29 2002
+	- original version
