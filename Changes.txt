@@ -1,5 +1,9 @@
 Revision history for Perl extension DBIx::HTML::LinkedMenus.
 
+1.05  Tue Jun  3 18:44:00 2003
+	- No source code changes in this version
+	- Clarify the docs as to what linked menus are
+
 1.04  Sun Mar 23 11:29:00 2003
 	- No source code changes in this version
 	- Patch to stop shipping blib/ directory in Unix distros, because the

@@ -5,6 +5,6 @@ test.pl
 LinkedMenus.html
 MANIFEST
 README
-t/test.t
 examples/bootstrap-menus.pl
 examples/test-linked-menus.cgi
+t/test.t

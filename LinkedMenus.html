@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<title>C&lt;DBIx::HTML::LinkedMenus&gt; - Convert db data to 2 linked HTML popup menus.</title>
+<title>C&lt;DBIx::HTML::LinkedMenus&gt; - Convert SQL to 2 linked HTML popup menus.</title>
 <link rev="made" href="mailto:" />
 </head>
 
@@ -30,7 +30,7 @@
 <p>
 </p>
 <h1><a name="name">NAME</a></h1>
-<p><code>DBIx::HTML::LinkedMenus</code> - Convert db data to 2 linked HTML popup menus.</p>
+<p><code>DBIx::HTML::LinkedMenus</code> - Convert SQL to 2 linked HTML popup menus.</p>
 <p>
 </p>
 <hr />
@@ -53,33 +53,52 @@
         print $linker -&gt; javascript_for_db();
         print $linker -&gt; html_for_base_menu();
         print $linker -&gt; html_for_linked_menu();
-        print $linker -&gt; javascript_for_init_menu();</pre>
+        print $linker -&gt; javascript_for_init_menu(); # Either this...
+        print $q -&gt; end_form();</pre>
 <pre>
         # Alternately, print as part of a page:</pre>
 <pre>
-        my(@on_load) = $linker -&gt; javascript_for_on_load();</pre>
+        my(@on_load) = $linker -&gt; javascript_for_on_load(); # Or these 2...</pre>
 <pre>
         print $q -&gt; start_html({title =&gt; 'Linked Menus', @on_load}),
         print $q -&gt; start_form...
         print $linker -&gt; javascript_for_db();
         print $linker -&gt; html_for_base_menu();
-        print $linker -&gt; html_for_linked_menu();</pre>
+        print $linker -&gt; html_for_linked_menu();
+        print $q -&gt; end_form();</pre>
 <p>
 </p>
 <hr />
 <h1><a name="description">Description</a></h1>
-<p>This module takes a db handle and 2 SQL statements, and builds an internal hash.</p>
+<p>This module's constructor takes a db handle and 2 SQL statements, and executes the SQL.</p>
+<p>The first SQL statement is used to create a pop-up menu - the base menu.</p>
+<p>The constructor returns undef if the SQL for the base menu returns 0 items.</p>
+<p>The second SQL statement is used to create another pop-up menu - the linked menu.</p>
+<p>By linked I mean each item in the base menu has a corresponding set of items in the linked menu.</p>
+<p>Eg: If the available selections on the base menu are A and B, and A is the current selection, then the linked menu
+will display (say) A1, A2 and A3. Then, when the user changes the current selection on the base menu from A to B,
+the javascript provided will automatically change the available selections on the linked menu to (say) B1 and B2.</p>
 <p>Details of the SQL are explained below.</p>
-<p>Then you ask for that hash in the form of both JavaScript and HTML.</p>
+<p>You use the methods, as above, to retrieve the JavaScript and HTML, and include them in your CGI form.</p>
 <p>The JavaScript is in 2 parts:</p>
 <dl>
 <dt><strong><a name="item_the_data_and_some_general_functions">The data and some general functions</a></strong><br />
 </dt>
+<dd>
+This is returned by the method javascript_for_db().
+</dd>
+<p></p>
 <dt><strong><a name="item_a_function_call_to_initialize_the_linked%2dmenu_sy">A function call to initialize the linked-menu system</a></strong><br />
 </dt>
 <dd>
-This initialization code can be output after the other components of the
-form, or it can be output as the form's onLoad event handler.
+This is returned by the method javascript_for_init_menu(), or by the method javascript_for_on_load().
+</dd>
+<dd>
+<p>This initialization code can be output after the other components of the
+form, or it can be output as the form's onLoad event handler.</p>
+</dd>
+<dd>
+<p>Both ways of doing this are demonstrated in the Synopsis.</p>
 </dd>
 <dd>
 <p>Either way, it must be called.</p>
@@ -90,8 +109,11 @@ form, or it can be output as the form's onLoad event handler.
 <dt><strong><a name="item_the_html_for_the_base_menu">The HTML for the base menu</a></strong><br />
 </dt>
 <dd>
-As the user of the form changes her selection on the base menu,
-the available items on the linked menu change in lockstep.
+This is returned by the method html_for_base_menu().
+</dd>
+<dd>
+<p>As the user of the form changes her selection on the base menu,
+the available items on the linked menu change in lockstep.</p>
 </dd>
 <dd>
 <p>The selections on the base menu are determined by the base_sql parameter.</p>
@@ -100,11 +122,14 @@ the available items on the linked menu change in lockstep.
 <dt><strong><a name="item_the_html_for_the_linked_menu">The HTML for the linked menu</a></strong><br />
 </dt>
 <dd>
-The selections on the linked menu, for each base menu selection, are determined
-by the linked_sql parameter.
+This is returned by the method html_for_linked_menu().
+</dd>
+<dd>
+<p>The selections on the linked menu, for each base menu selection, are determined
+by the linked_sql parameter.</p>
 </dd>
 <p></p></dl>
-<p>These are available separately so you can place them anywhere on your form.</p>
+<p>These 2 menus are available separately so you can place them anywhere on your form.</p>
 <p>After a call to new, you can call the 'size' method if you need to check how
 many rows were returned by the base SQL you used.</p>
 <p>Neither the module CGI.pm, nor any of that kidney, are used by this module.
@@ -146,6 +171,9 @@ call its <code>param()</code> method to retrieve the user's selection on the bas
 <p>But don't call CGI's param(). Call our <a href="#item_get"><code>get()</code></a> method, and it will return
 the base and linked menu selections from the internal hash holding the data.</p>
 </dd>
+<dd>
+<p>Examine the demo in the examples/ directory to clarify this process.</p>
+</dd>
 <p></p>
 <dt><strong><a name="item_base_sql_%3d%3e_%27%27">base_sql =&gt; ''</a></strong><br />
 </dt>
@@ -177,7 +205,7 @@ base menu.
 </dt>
 <dd>
 The third column will be used as the value plugged into the linked_sql in place
-of the ? to select a set of items for the linked menu which will correspond to the base
+of the ? to select a set of items for the linked menu which will correspond to this base
 menu item.
 </dd>
 <p></p></dl>
@@ -224,6 +252,9 @@ call its <code>param()</code> method to retrieve the user's selection on the lin
 <dd>
 <p>But don't call CGI's param(). Call our <a href="#item_get"><code>get()</code></a> method, and it will return
 the base and linked menu selections from the internal hash holding the data.</p>
+</dd>
+<dd>
+<p>Examine the demo in the examples/ directory to clarify this process.</p>
 </dd>
 <p></p>
 <dt><strong><a name="item_linked_sql_%3d%3e_%27%27">linked_sql =&gt; ''</a></strong><br />
@@ -403,7 +434,6 @@ modules, so don't be too keen on changing it :-).</p>
         CGI::Explorer
         DBIx::HTML::ClientDB
         DBIx::HTML::PopupRadio</pre>
-<p>The latter 2 modules will be released after the current one.</p>
 <p>
 </p>
 <hr />

@@ -43,7 +43,7 @@ our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw(
 
 );
-our $VERSION = '1.04';
+our $VERSION = '1.05';
 
 # -----------------------------------------------
 
@@ -338,7 +338,7 @@ __END__
 
 =head1 NAME
 
-C<DBIx::HTML::LinkedMenus> - Convert db data to 2 linked HTML popup menus.
+C<DBIx::HTML::LinkedMenus> - Convert SQL to 2 linked HTML popup menus.
 
 =head1 Synopsis
 
@@ -359,25 +359,39 @@ C<DBIx::HTML::LinkedMenus> - Convert db data to 2 linked HTML popup menus.
 	print $linker -> javascript_for_db();
 	print $linker -> html_for_base_menu();
 	print $linker -> html_for_linked_menu();
-	print $linker -> javascript_for_init_menu();
+	print $linker -> javascript_for_init_menu(); # Either this...
+	print $q -> end_form();
 
 	# Alternately, print as part of a page:
 
-	my(@on_load) = $linker -> javascript_for_on_load();
+	my(@on_load) = $linker -> javascript_for_on_load(); # Or these 2...
 
 	print $q -> start_html({title => 'Linked Menus', @on_load}),
 	print $q -> start_form...
 	print $linker -> javascript_for_db();
 	print $linker -> html_for_base_menu();
 	print $linker -> html_for_linked_menu();
+	print $q -> end_form();
 
 =head1 Description
 
-This module takes a db handle and 2 SQL statements, and builds an internal hash.
+This module's constructor takes a db handle and 2 SQL statements, and executes the SQL.
+
+The first SQL statement is used to create a pop-up menu - the base menu.
+
+The constructor returns undef if the SQL for the base menu returns 0 items.
+
+The second SQL statement is used to create another pop-up menu - the linked menu.
+
+By linked I mean each item in the base menu has a corresponding set of items in the linked menu.
+
+Eg: If the available selections on the base menu are A and B, and A is the current selection, then the linked menu
+will display (say) A1, A2 and A3. Then, when the user changes the current selection on the base menu from A to B,
+the javascript provided will automatically change the available selections on the linked menu to (say) B1 and B2.
 
 Details of the SQL are explained below.
 
-Then you ask for that hash in the form of both JavaScript and HTML.
+You use the methods, as above, to retrieve the JavaScript and HTML, and include them in your CGI form.
 
 The JavaScript is in 2 parts:
 
@@ -385,10 +399,16 @@ The JavaScript is in 2 parts:
 
 =item The data and some general functions
 
+This is returned by the method javascript_for_db().
+
 =item A function call to initialize the linked-menu system
+
+This is returned by the method javascript_for_init_menu(), or by the method javascript_for_on_load().
 
 This initialization code can be output after the other components of the
 form, or it can be output as the form's onLoad event handler.
+
+Both ways of doing this are demonstrated in the Synopsis.
 
 Either way, it must be called.
 
@@ -400,6 +420,8 @@ The HTML is also in 2 parts:
 
 =item The HTML for the base menu
 
+This is returned by the method html_for_base_menu().
+
 As the user of the form changes her selection on the base menu,
 the available items on the linked menu change in lockstep.
 
@@ -407,12 +429,14 @@ The selections on the base menu are determined by the base_sql parameter.
 
 =item The HTML for the linked menu
 
+This is returned by the method html_for_linked_menu().
+
 The selections on the linked menu, for each base menu selection, are determined
 by the linked_sql parameter.
 
 =back
 
-These are available separately so you can place them anywhere on your form.
+These 2 menus are available separately so you can place them anywhere on your form.
 
 After a call to new, you can call the 'size' method if you need to check how
 many rows were returned by the base SQL you used.
@@ -456,6 +480,8 @@ call its param() method to retrieve the user's selection on the base menu.
 But don't call CGI's param(). Call our get() method, and it will return
 the base and linked menu selections from the internal hash holding the data.
 
+Examine the demo in the examples/ directory to clarify this process.
+
 =item base_sql => ''
 
 This option is mandatory.
@@ -479,7 +505,7 @@ base menu.
 =item Third column
 
 The third column will be used as the value plugged into the linked_sql in place
-of the ? to select a set of items for the linked menu which will correspond to the base
+of the ? to select a set of items for the linked menu which will correspond to this base
 menu item.
 
 =back
@@ -521,6 +547,8 @@ call its param() method to retrieve the user's selection on the linked menu.
 
 But don't call CGI's param(). Call our get() method, and it will return
 the base and linked menu selections from the internal hash holding the data.
+
+Examine the demo in the examples/ directory to clarify this process.
 
 =item linked_sql => ''
 
@@ -669,8 +697,6 @@ modules, so don't be too keen on changing it :-).
 	CGI::Explorer
 	DBIx::HTML::ClientDB
 	DBIx::HTML::PopupRadio
-
-The latter 2 modules will be released after the current one.
 
 =head1 Author
 
