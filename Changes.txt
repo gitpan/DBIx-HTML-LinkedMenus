@@ -1,5 +1,10 @@
 Revision history for Perl extension DBIx::HTML::LinkedMenus.
 
+1.06  Mon Jul 19 14:43:00 2004
+	- Change Makefile.PL to coexist with Module::Build
+	- Delete ./test.pl
+	- Add t/pod.t to test all PODs
+
 1.05  Tue Jun  3 18:44:00 2003
 	- No source code changes in this version
 	- Clarify the docs as to what linked menus are

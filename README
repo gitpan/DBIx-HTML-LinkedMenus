@@ -1,346 +1,56 @@
-NAME
-    "DBIx::HTML::LinkedMenus" - Convert SQL to 2 linked HTML popup menus.
+README file for DBIx::HTML::LinkedMenus.
 
-Synopsis
-            use DBIx::HTML::LinkedMenus;
+Warning: WinZip 8.1 and 9.0 both contain an 'accidental' bug which stops
+them recognizing POSIX-style directory structures in valid tar files.
+You are better off using a reliable tool such as InfoZip:
+ftp://ftp.info-zip.org/pub/infozip/
 
-            my($linker) = DBIx::HTML::LinkedMenus -> new
-            (
-                    dbh        => $dbh,
-                    base_sql   => 'select campus_id, campus_name, campus_id ' .
-                                                    'from campus order by campus_name',
-                    linked_sql => 'select unit_id, unit_code from unit where ' .
-                                                    'unit_campus_id = ? order by unit_code',
-            );
+1 Installing from a Unix-like distro
+------------------------------------
+shell>gunzip DBIx-HTML-LinkedMenus-1.06.tgz
+shell>tar mxvf DBIx-HTML-LinkedMenus-1.06.tar
 
-            # Print as part of a form:
+On Unix-like systems, assuming you have installed Module::Build V 0.25+:
 
-            print $q -> start_form...
-            print $linker -> javascript_for_db();
-            print $linker -> html_for_base_menu();
-            print $linker -> html_for_linked_menu();
-            print $linker -> javascript_for_init_menu(); # Either this...
-            print $q -> end_form();
+shell>perl Build.PL
+shell>./Build
+shell>./Build test
+shell>./Build install
 
-            # Alternately, print as part of a page:
+On MS Windows-like systems, assuming you have installed Module::Build V 0.25+:
 
-            my(@on_load) = $linker -> javascript_for_on_load(); # Or these 2...
+shell>perl Build.PL
+shell>perl Build
+shell>perl Build test
+shell>perl Build install
 
-            print $q -> start_html({title => 'Linked Menus', @on_load}),
-            print $q -> start_form...
-            print $linker -> javascript_for_db();
-            print $linker -> html_for_base_menu();
-            print $linker -> html_for_linked_menu();
-            print $q -> end_form();
+Alternately, without Module::Build, you do this:
 
-Description
-    This module's constructor takes a db handle and 2 SQL statements, and
-    executes the SQL.
+Note: 'make' on MS Windows-like systems may be called 'nmake' or 'dmake'.
 
-    The first SQL statement is used to create a pop-up menu - the base menu.
+shell>perl Makefile.PL
+shell>make
+shell>make test
+shell>su              (for Unix-like systems)
+shell>make install
+shell>exit            (for Unix-like systems)
 
-    The constructor returns undef if the SQL for the base menu returns 0
-    items.
+On all systems:
 
-    The second SQL statement is used to create another pop-up menu - the
-    linked menu.
+Run LinkedMenus.pm through you favourite pod2html translator.
 
-    By linked I mean each item in the base menu has a corresponding set of
-    items in the linked menu.
+If you are using my fancy-pom2.pl, with its 'default.css' file installed in
+/apache2/htdocs/css/, you'd do:
 
-    Eg: If the available selections on the base menu are A and B, and A is
-    the current selection, then the linked menu will display (say) A1, A2
-    and A3. Then, when the user changes the current selection on the base
-    menu from A to B, the javascript provided will automatically change the
-    available selections on the linked menu to (say) B1 and B2.
+shell>perl fancy-pom2.pl html -css LinkedMenus.pm > /apache2/htdocs/LinkedMenus.html
 
-    Details of the SQL are explained below.
+or perhaps something like:
 
-    You use the methods, as above, to retrieve the JavaScript and HTML, and
-    include them in your CGI form.
+shell>perl fancy-pom2.pl html -css LinkedMenus.pm > /perl/html/site/lib/DBIx/HTML/LinkedMenus.html
 
-    The JavaScript is in 2 parts:
-
-    The data and some general functions
-        This is returned by the method javascript_for_db().
-
-    A function call to initialize the linked-menu system
-        This is returned by the method javascript_for_init_menu(), or by the
-        method javascript_for_on_load().
-
-        This initialization code can be output after the other components of
-        the form, or it can be output as the form's onLoad event handler.
-
-        Both ways of doing this are demonstrated in the Synopsis.
-
-        Either way, it must be called.
-
-    The HTML is also in 2 parts:
-
-    The HTML for the base menu
-        This is returned by the method html_for_base_menu().
-
-        As the user of the form changes her selection on the base menu, the
-        available items on the linked menu change in lockstep.
-
-        The selections on the base menu are determined by the base_sql
-        parameter.
-
-    The HTML for the linked menu
-        This is returned by the method html_for_linked_menu().
-
-        The selections on the linked menu, for each base menu selection, are
-        determined by the linked_sql parameter.
-
-    These 2 menus are available separately so you can place them anywhere on
-    your form.
-
-    After a call to new, you can call the 'size' method if you need to check
-    how many rows were returned by the base SQL you used.
-
-    Neither the module CGI.pm, nor any of that kidney, are used by this
-    module. We simply output pure HTML.
-
-    However, for simplicity, this document pretends you are using CGI.pm
-    rather than an alternative. The sentences would become too convoluted
-    otherwise.
-
-Distributions
-    This module is available both as a Unix-style distro (*.tgz) and an
-    ActiveState-style distro (*.ppd). The latter is shipped in a *.zip file.
-
-    See http://savage.net.au/Perl-modules/html/installing-a-module.html for
-    help on unpacking and installing each type of distro.
-
-Usage
-    You create an object of the class by calling the constructor, 'new'.
-
-    Now call four (4) methods to get the HTML and the JavaScript.
-
-    Lastly, display the HTML and JavaScript as part of a form.
-
-Options
-    Here, in alphabetical order, are the options accepted by the
-    constructor, together with their default values.
-
-    base_menu_name => 'dbix_base_menu'
-        This option is not mandatory, since it has a default value.
-
-        The value of this parameter is what you would pass into a CGI object
-        when you call its param() method to retrieve the user's selection on
-        the base menu.
-
-        But don't call CGI's param(). Call our get() method, and it will
-        return the base and linked menu selections from the internal hash
-        holding the data.
-
-        Examine the demo in the examples/ directory to clarify this process.
-
-    base_sql => ''
-        This option is mandatory.
-
-        This is the SQL used to select items for the base menu.
-
-        The SQL must select three (3) columns, in this order:
-
-        First column
-            The first column will be used as the value returned by a CGI
-            object, for example, when you call its param(<base_menu_name>)
-            method.
-
-        Second column
-            The second column will be used as the visible selection offered
-            to the user on the base menu.
-
-        Third column
-            The third column will be used as the value plugged into the
-            linked_sql in place of the ? to select a set of items for the
-            linked menu which will correspond to this base menu item.
-
-        Of course, the first 2 columns selected could be the same:
-
-                base_sql => 'select campus_name, campus_name, campus_id ' .
-                                        'from campus order by campus_name'
-
-        But normally you would do this:
-
-                base_sql => 'select campus_id, campus_name, campus_id from ' .
-                                        'campus order by campus_name'
-
-        Again: This means that the second column is used to construct
-        visible menu items, and when an item is selected by the user, the
-        first column is what is returned to your CGI script, and the third
-        column is used to select items for the linked menu.
-
-    dbh => ''
-        Pass in an open database handle.
-
-        This option is mandatory.
-
-    form_name => 'dbix_form'
-        This option is not mandatory, since it has a default value.
-
-        The value of this parameter becomes the name for the form used in
-        the JavaScript, and must be the name used by you in your call to
-        CGI's start_form() or start_multipart_form() method.
-
-    linked_menu_name => 'dbix_linked_menu'
-        This option is not mandatory, since it has a default value.
-
-        The value of this parameter is what you would pass into a CGI object
-        when you call its param() method to retrieve the user's selection on
-        the linked menu.
-
-        But don't call CGI's param(). Call our get() method, and it will
-        return the base and linked menu selections from the internal hash
-        holding the data.
-
-        Examine the demo in the examples/ directory to clarify this process.
-
-    linked_sql => ''
-        This option is mandatory.
-
-        This is the SQL used to select items for the linked menu for each
-        selection of the base menu.
-
-        The SQL must select two (2) columns, in this order:
-
-        First column
-            The first column will be used as the value returned by a CGI
-            object, for example, when you call its param(<linked_menu_name>)
-            method.
-
-        Second column
-            The second column will be used as the visible selection offered
-            to the user on the linked menu.
-
-        Of course, the first 2 columns selected could be the same:
-
-                linked_sql => 'select unit_code, unit_code from unit where ' .
-                                        'unit_campus_id = ? order by unit_code',
-
-        But normally you would do this:
-
-                linked_sql => 'select unit_id, unit_code from unit where ' .
-                                        'unit_campus_id = ? order by unit_code',
-
-        Again: This means that the second column is used to construct
-        visible menu items, and when an item is selected by the user, the
-        first column is what is returned to your CGI script.
-
-        Now, notice the where clause. Each value of column three (3)
-        returned by the base_sql is used to select a set of items for the
-        linked menu. The ? in the linked_sql's where clause is where the
-        value from the third column of the base_sql is plugged into the
-        linked_sql.
-
-        If a particular value of the base_sql's column three (3) does not
-        return any items for the linked menu, then that basic item does not
-        appear on the base menu.
-
-Methods
-    get($base_id, $link_id)
-        Returns the 2 visible menu items, (base, linked), corresponding to
-        the 2 menu selections.
-
-        Returns () if either $base_id or $link_id is not a key into the
-        internal hash holding the data.
-
-        You would normally do something like this:
-
-                my($base_id) = $q -> param('dbix_base_menu')   || '';
-                my($link_id) = $q -> param('dbix_linked_menu') || '';
-                my($linker)  = ...
-                my(@value)   = $linker -> get($base_id, $link_id);
-
-    html_for_base_menu()
-        Returns the HTML for a popup menu named after the base_menu_name
-        parameter.
-
-        Output it somewhere suitable on your page.
-
-        Calling this method and outputting the HTML is mandatory.
-
-    html_for_linked_menu()
-        Returns the HTML for a popup menu named after the linked_menu_name
-        parameter.
-
-        Output it somewhere suitable on your page.
-
-        Calling this method and outputting the HTML is mandatory.
-
-    javascript_for_db()
-        Returns JavaScript, including the <script>...</script> tags, which
-        holds your data in a JavaScript db, and includes some JavaScript
-        functions.
-
-        Output it somewhere suitable on your page.
-
-        Calling this method and outputting the JavaScript is mandatory.
-
-    javascript_for_init_menu()
-        Returns JavaScript, including the <script>...</script> tags, which
-        holds the function call to a function which initializes the
-        linked-menu system. The function itself is included in the code
-        returned by javascript_for_db().
-
-        Output it somewhere on your page after you have output the 2 pieces
-        of HTML and after you have output the string returned from
-        javascript_for_db().
-
-        Calling this method is optional. If you do not call it, then calling
-        the method javascript_for_on_load() is mandatory.
-
-    javascript_for_on_load()
-        Returns a string to be used as a <body> tag's onLoad event handler.
-        It calls the function which initializes the linked-menu system. The
-        function itself is included in the code returned by
-        javascript_for_db().
-
-        Output it as part of the <body> tag. See
-        examples/test-linked-menus.cgi for an example.
-
-        Calling this method is optional. If you do not call it, then calling
-        the method javascript_for_init_menu() is mandatory.
-
-    new(%arg)
-        The constructor.
-
-        See the previous section for details of the parameters.
-
-    size()
-        Returns the number of rows returned by your base SQL.
-
-        It will tell you whether or not your base menu is empty.
-
-Sample Code
-    See examples/test-linked-menus.cgi for a complete program.
-
-    You will need to run examples/bootstrap-menus.pl to load the 'test'
-    database, 'campus' and 'unit' tables, with sample data.
-
-    You'll have to patch these 2 programs vis-a-vis the db vendor, username
-    and password.
-
-    The sample data in bootstrap-menus.pl is simple, but is used by several
-    modules, so don't be too keen on changing it :-).
-
-See Also
-            CGI::Explorer
-            DBIx::HTML::ClientDB
-            DBIx::HTML::PopupRadio
-
-Author
-    "DBIx::HTML::LinkedMenus" was written by Ron Savage
-    *<ron@savage.net.au>* in 2002.
-
-    Home page: http://savage.net.au/index.html
-
-Copyright
-    Austrlian copyright (c) 2002, Ron Savage. All rights reserved.
-
-            All Programs of mine are 'OSI Certified Open Source Software';
-            you can redistribute them and/or modify them under the terms of
-            The Artistic License, a copy of which is available at:
-            http://www.opensource.org/licenses/index.html
-
+2 Installing from an ActiveState distro
+---------------------------------------
+shell>unzip DBIx-HTML-LinkedMenus-1.06.zip
+shell>ppm install --location=. DBIx-HTML-LinkedMenus
+shell>del DBIx-HTML-LinkedMenus-1.06.ppd
+shell>del PPM-DBIx-HTML-LinkedMenus-1.06.tar.gz

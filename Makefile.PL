@@ -7,19 +7,26 @@ WriteMakefile
 (
 	($] ge '5.005') ?
 	(
-		'AUTHOR' => 'Ron Savage (ron@savage.net.au)',
-		'ABSTRACT' => 'Convert SQL to 2 linked HTML popup menus',
+		'AUTHOR'	=> 'Ron Savage (ron@savage.net.au)',
+		'ABSTRACT'	=> 'Convert SQL to 2 linked HTML popup menus',
     ) : (),
-	clean				=>
+	clean			=>
 	{
-		FILES			=> 'blib/* Makefile MANIFEST DBIx-HTML-LinkedMenus-*'
+		FILES		=> 'blib/* Makefile MANIFEST DBIx-HTML-LinkedMenus-*'
 	},
-	dist				=>
+	dist			=>
 	{
-		COMPRESS		=> 'gzip',
-		SUFFIX			=> 'gz'
+		COMPRESS	=> 'gzip',
+		SUFFIX		=> 'gz'
 	},
-	DISTNAME			=> 'DBIx-HTML-LinkedMenus',
-	NAME				=> 'DBIx::HTML::LinkedMenus',
-	VERSION_FROM		=> 'LinkedMenus.pm',
+	DISTNAME		=> 'DBIx-HTML-LinkedMenus',
+	NAME			=> 'DBIx::HTML::LinkedMenus',
+	PL_FILES		=> {},
+	PREREQ_PM		=>
+	{
+		Carp		=> 0,
+		Test::More	=> 0,
+		Test::Pod	=> 0,
+	},
+	VERSION_FROM	=> 'lib/DBIx/HTML/LinkedMenus.pm',
 );
