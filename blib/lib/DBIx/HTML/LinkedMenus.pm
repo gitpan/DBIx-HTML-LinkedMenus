@@ -43,7 +43,7 @@ our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw(
 
 );
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 
 # -----------------------------------------------
 
@@ -666,10 +666,9 @@ modules, so don't be too keen on changing it :-).
 
 =head1 See Also
 
+	CGI::Explorer
 	DBIx::HTML::ClientDB
 	DBIx::HTML::PopupRadio
-	DBIx::CSS::TreeMenu
-	DBIx::CSS::TabMenu
 
 The latter 2 modules will be released after the current one.
 

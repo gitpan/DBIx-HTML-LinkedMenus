@@ -1,11 +1,11 @@
 Changes.txt
-LinkedMenus.html
 LinkedMenus.pm
 Makefile.PL
-README
 test.pl
 pm_to_blib
+LinkedMenus.html
 MANIFEST
+README
 blib/html/site/lib/DBIx/HTML/LinkedMenus.html
 blib/man3/.exists
 blib/arch/auto/DBIx/HTML/LinkedMenus/.exists
