@@ -43,7 +43,7 @@ our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw(
 
 );
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 # -----------------------------------------------
 
@@ -313,6 +313,8 @@ sub new
 
 	$self -> _validate_options();
 	$self -> _read_data();
+
+	$self = undef if (! $$self{'_size'});
 
 	return $self;
 
@@ -679,7 +681,7 @@ Home page: http://savage.net.au/index.html
 
 =head1 Copyright
 
-Australian copyright (c) 2002, Ron Savage. All rights reserved.
+Austrlian copyright (c) 2002, Ron Savage. All rights reserved.
 
 	All Programs of mine are 'OSI Certified Open Source Software';
 	you can redistribute them and/or modify them under the terms of

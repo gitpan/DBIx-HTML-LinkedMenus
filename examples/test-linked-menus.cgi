@@ -47,7 +47,7 @@ try
 		form_name			=> $form_name,
 		base_sql			=> 'select campus_id, campus_name, campus_id from campus order by campus_name',
 		linked_sql			=> 'select unit_id, unit_code from unit where unit_campus_id = ? order by unit_code',
-	);
+	) || throw Error::Simple('Base SQL returned 0 rows');
 
 	# Either call javascript_for_on_load() or call javascript_for_init_menu().
 	# For usage of the @on_load array, see the call to start_html().
