@@ -13,8 +13,8 @@ package DBIx::HTML::LinkedMenus;
 #	o tab = 4 spaces || die
 #
 # Author:
-#	Ron Savage <rons@deakin.edu.au>
-#	Home page: http://www.deakin.edu.au/~rons
+#	Ron Savage <ron@savage.net.au>
+#	Home page: http://savage.net.au/index.html
 
 use strict;
 use warnings;
@@ -43,7 +43,7 @@ our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw(
 
 );
-our $VERSION = '1.06';
+our $VERSION = '1.07';
 
 # -----------------------------------------------
 
@@ -57,10 +57,14 @@ our $VERSION = '1.06';
 	my(%_attr_data) =
 	(	# Alphabetical order.
 		_base_menu_name		=> 'dbix_base_menu',
+		_base_prompt		=> undef,
+		_base_value			=> undef,
 		_base_sql			=> '',
 		_dbh				=> '',
 		_form_name			=> 'dbix_form',
 		_linked_menu_name	=> 'dbix_linked_menu',
+		_linked_prompt		=> undef,
+		_linked_value		=> undef,
 		_linked_sql			=> '',
 	);
 
@@ -219,8 +223,15 @@ EOS
 	my(@base)		= sort{$$self{'_data'}{$a}{'order'} <=> $$self{'_data'}{$b}{'order'} } keys %{$$self{'_data'} };
 	my($base_index)	= -1;
 
-	push(@code, 'var dbix_base   = new Array(' . ($#base + 1) . ');');
-	push(@code, 'var dbix_link   = new Array(' . ($#base + 1) . ');', '');
+	if (defined($$self{'_base_prompt'}) && defined($$self{'_base_value'}) )
+	{
+		unshift @base, $$self{'_base_value'};
+
+		$$self{'_data'}{$$self{'_base_value'} }{'value'} = $$self{'_base_prompt'};
+	}
+
+	push @code, 'var dbix_base   = new Array(' . ($#base + 1) . ');';
+	push @code, 'var dbix_link   = new Array(' . ($#base + 1) . ');', '';
 
 	my($base, @link, $link_index);
 
@@ -231,23 +242,30 @@ EOS
 		@link		= sort{$$self{'_data'}{$base}{'link'}{$a}{'order'} <=> $$self{'_data'}{$base}{'link'}{$b}{'order'} } keys %{$$self{'_data'}{$base}{'link'} };
 		$link_index	= -1;
 
+		if (defined($$self{'_linked_prompt'}) && defined($$self{'_linked_value'}) )
+		{
+			unshift @link, $$self{'_linked_value'};
+
+			$$self{'_data'}{$base}{'link'}{$$self{'_linked_value'} }{'value'} = $$self{'_linked_prompt'};
+		}
+
 		for (@link)
 		{
 			$link_index++;
 
 			if ($link_index == 0)
 			{
-				push(@code, qq|dbix_base[$base_index]    = new dbix_Item("$base", "$$self{'_data'}{$base}{'value'}");|);
-				push(@code, "dbix_link[$base_index]    = new Array(" . ($#link + 1) . ');');
+				push @code, qq|dbix_base[$base_index]    = new dbix_Item("$base", "$$self{'_data'}{$base}{'value'}");|;
+				push @code, "dbix_link[$base_index]    = new Array(" . ($#link + 1) . ');';
 			}
 
-			push(@code, qq|dbix_link[$base_index][$link_index] = new dbix_Item("$_", "$$self{'_data'}{$base}{'link'}{$_}{'value'}");|);
+			push @code, qq|dbix_link[$base_index][$link_index] = new dbix_Item("$_", "$$self{'_data'}{$base}{'link'}{$_}{'value'}");|;
 		}
 
-		push(@code, '');
+		push @code, '';
 	}
 
-	push(@code, <<EOS);
+	push @code, <<EOS;
 //-->
 </script>
 
@@ -463,16 +481,18 @@ Now call four (4) methods to get the HTML and the JavaScript.
 
 Lastly, display the HTML and JavaScript as part of a form.
 
-=head1 Options
+=head1 Constructor and initialization
 
-Here, in alphabetical order, are the options accepted by the constructor,
+C<new(...)> returns a C<DBIx::HTML::LinkedMenus> object.
+
+Here, in alphabetical order, are the parameters accepted by the constructor,
 together with their default values.
 
 =over 4
 
 =item base_menu_name => 'dbix_base_menu'
 
-This option is not mandatory, since it has a default value.
+This parameter is optional, since it has a default value.
 
 The value of this parameter is what you would pass into a CGI object when you
 call its param() method to retrieve the user's selection on the base menu.
@@ -482,9 +502,25 @@ the base and linked menu selections from the internal hash holding the data.
 
 Examine the demo in the examples/ directory to clarify this process.
 
+=item base_prompt
+
+This parameter is optional.
+
+Use this to specify a non-undef string to appear at the start of the base menu.
+
+The default value is undef.
+
+=item base_value
+
+This parameter is optional.
+
+Use this to specify a non-undef value to be returned to the CGI script when the base_prompt is selected.
+
+The default value is undef.
+
 =item base_sql => ''
 
-This option is mandatory.
+This parameter is mandatory.
 
 This is the SQL used to select items for the base menu.
 
@@ -528,11 +564,11 @@ CGI script, and the third column is used to select items for the linked menu.
 
 Pass in an open database handle.
 
-This option is mandatory.
+This parameter is mandatory.
 
 =item form_name => 'dbix_form'
 
-This option is not mandatory, since it has a default value.
+This parameter is optional, since it has a default value.
 
 The value of this parameter becomes the name for the form used in the
 JavaScript, and must be the name used by you in your call to CGI's start_form()
@@ -540,7 +576,7 @@ or start_multipart_form() method.
 
 =item linked_menu_name => 'dbix_linked_menu'
 
-This option is not mandatory, since it has a default value.
+This parameter is optional, since it has a default value.
 
 The value of this parameter is what you would pass into a CGI object when you
 call its param() method to retrieve the user's selection on the linked menu.
@@ -550,9 +586,25 @@ the base and linked menu selections from the internal hash holding the data.
 
 Examine the demo in the examples/ directory to clarify this process.
 
+=item linked_prompt
+
+This parameter is optional.
+
+Use this to specify a non-undef string to appear at the start of the linked menu.
+
+The default value is undef.
+
+=item linked_value
+
+This parameter is optional.
+
+Use this to specify a non-undef value to be returned to the CGI script when the linked_prompt is selected.
+
+The default value is undef.
+
 =item linked_sql => ''
 
-This option is mandatory.
+This parameter is mandatory.
 
 This is the SQL used to select items for the linked menu for each
 selection of the base menu.
@@ -682,6 +734,14 @@ It will tell you whether or not your base menu is empty.
 =head1 Sample Code
 
 See examples/test-linked-menus.cgi for a complete program.
+
+The use of undef for the 4 parameters base_prompt, base_value, linked_prompt and linked_value
+should not be confused with the use of undef in the test program.
+
+The latter is used to indicate the first time the program is run, in which case there are no
+values returned by CGI's param method. See lines 21 and 22.
+
+Further, see line 63 of test-linked-menus.cgi for the correct way to check for these undefs.
 
 You will need to run examples/bootstrap-menus.pl to load the 'test'
 database, 'campus' and 'unit' tables, with sample data.

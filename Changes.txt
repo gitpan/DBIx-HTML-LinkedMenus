@@ -1,5 +1,17 @@
 Revision history for Perl extension DBIx::HTML::LinkedMenus.
 
+1.07  Tue Jan 18 22:14:00 2005
+	- Add new parameters to new(): base_prompt, base_value, linked_prompt and linked_value
+		which allow you to specify strings, and their corresponding values, to be output
+		at the top of the 2 menus. The default behaviour is identical to the previous version.
+		See examples/test-linked-menus.cgi. Original patch by Sean McKenna
+	- Update docs
+	- Update examples/test-linked-menus.cgi
+	- Note: Originally I omitted such options because I thought these values should always come
+		from the database, but this change just gives you another way to do it. In fact, this
+		way is neater since you can supply strings which you would not normally have in the
+		database in the first place
+
 1.06  Mon Jul 19 14:43:00 2004
 	- Change Makefile.PL to coexist with Module::Build
 	- Delete ./test.pl

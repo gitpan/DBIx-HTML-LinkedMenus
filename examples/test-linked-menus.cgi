@@ -18,8 +18,8 @@ my($q)				= CGI -> new();
 my($form_name)		= 'my_form';
 my($base_name)		= 'base';	# Default: 'dbix_base_menu'.
 my($linked_name)	= 'linker';	# Default: 'dbix_linked_menu'.
-my($base_id)		= $q -> param($base_name)	|| '';
-my($link_id)		= $q -> param($linked_name)	|| '';
+my($base_id)		= $q -> param($base_name)	|| undef;
+my($link_id)		= $q -> param($linked_name)	|| undef;
 
 my(@on_load, @html);
 
@@ -42,7 +42,11 @@ try
 	my($linker) = DBIx::HTML::LinkedMenus -> new
 	(
 		base_menu_name		=> $base_name,
+		base_prompt			=> 'Please select an item from both menus',
+		base_value			=> 0,
 		linked_menu_name	=> $linked_name,
+		linked_prompt		=> 'Please select 2 items',
+		linked_value		=> 0,
 		dbh					=> $dbh,
 		form_name			=> $form_name,
 		base_sql			=> 'select campus_id, campus_name, campus_id from campus order by campus_name',
@@ -56,7 +60,7 @@ try
 
 	push(@html, $linker -> javascript_for_db() );
 
-	if ($base_id && $link_id)
+	if (defined($base_id) && defined($link_id) )
 	{
 		my(@value) = $linker -> get($base_id, $link_id);
 
