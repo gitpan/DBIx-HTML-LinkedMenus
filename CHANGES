@@ -1,5 +1,16 @@
 Revision history for Perl extension DBIx::HTML::LinkedMenus.
 
+1.10  Sun Feb 21 12:54:58 2010
+	- Remove text 'All rights reserved' (for Debian licensing).
+	- Remove POD heads 'Required Modules' and 'Changes'.
+
+1.09  Wed Feb 10 14:01:47 2010
+	- MANIFEST.SKIP updated to exclude MYMETA.yml. Add MYMETA.yml.
+
+1.08  Fri Nov 13 13:20:00 2009
+	- Run dos2unix
+	- Rename Changes.txt to CHANGES
+
 1.07  Tue Jan 18 22:14:00 2005
 	- Add new parameters to new(): base_prompt, base_value, linked_prompt and linked_value
 		which allow you to specify strings, and their corresponding values, to be output
